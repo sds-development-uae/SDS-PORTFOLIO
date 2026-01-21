@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
-    const whatsappNumber = "918509529889";
+    const whatsappNumber = "971585533078";
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState("");
     const [scrolled, setScrolled] = useState(false);
@@ -35,26 +35,44 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    /* Active section observer */
+    /* Active section observer - FIXED with proper typing */
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveSection(`#${entry.target.id}`);
+        const handleActiveSection = () => {
+            const sections = NAV_ITEMS.map(item => document.querySelector(item.href));
+            const scrollPosition = window.scrollY + 100; // Adding offset
+
+            let currentActive = "";
+
+            sections.forEach((section, index) => {
+                if (section && section instanceof HTMLElement) {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+
+                    if (scrollPosition >= sectionTop &&
+                        scrollPosition < sectionTop + sectionHeight) {
+                        currentActive = NAV_ITEMS[index].href;
                     }
-                });
-            },
-            { threshold: 0.6 }
-        );
+                }
+            });
 
-        NAV_ITEMS.forEach((item) => {
-            const el = document.querySelector(item.href);
-            if (el) observer.observe(el);
-        });
+            // If no section is found, check if we're at the top
+            if (!currentActive && scrollPosition < 200) {
+                setActiveSection("");
+            } else if (currentActive && currentActive !== activeSection) {
+                setActiveSection(currentActive);
+            }
+        };
 
-        return () => observer.disconnect();
-    }, []);
+        // Initial check
+        handleActiveSection();
+
+        // Add scroll listener
+        window.addEventListener("scroll", handleActiveSection);
+
+        return () => {
+            window.removeEventListener("scroll", handleActiveSection);
+        };
+    }, [activeSection]);
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -80,7 +98,7 @@ export default function Navbar() {
                             {/* Mobile: Smaller logo */}
                             <div className="lg:hidden">
                                 <Image
-                                    src="/images/logo.png"
+                                    src="/images/sds_brand_logov2.png"
                                     alt="Sam Digital Solutions"
                                     width={scrolled ? 100 : 110}
                                     height={scrolled ? 25 : 28}
@@ -89,32 +107,17 @@ export default function Navbar() {
                                 />
                             </div>
 
-                            {/* Tablet: Medium logo */}
-                            <div className="hidden md:block lg:hidden">
-                                <Image
-                                    src="/images/logo.png"
-                                    alt="Sam Digital Solutions"
-                                    width={scrolled ? 120 : 130}
-                                    height={scrolled ? 30 : 33}
-                                    priority
-                                    className="object-contain transition-all duration-300"
-                                />
-                            </div>
-
                             {/* Desktop: Full logo */}
                             <div className="hidden lg:block">
                                 <Image
-                                    src="/images/logo.png"
+                                    src="/images/sds_brand_logov2.png"
                                     alt="Sam Digital Solutions"
-                                    width={scrolled ? 140 : 150}
+                                    width={scrolled ? 180 : 220}
                                     height={scrolled ? 35 : 38}
                                     priority
                                     className="object-contain transition-all duration-300 group-hover:scale-105"
                                 />
                             </div>
-
-                            {/* Desktop hover effect */}
-                            <div className="hidden lg:block absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></div>
                         </div>
                     </button>
 
@@ -220,23 +223,13 @@ export default function Navbar() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-accnt hover:shadow-lg transition-all duration-300"
+                            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-accent hover:shadow-lg transition-all duration-300"
                         >
                             <MessageCircle className="w-5 h-5" />
                             <span>WhatsApp</span>
                         </a>
                     </div>
                 </div>
-            </div>
-
-            {/* Simple scroll progress indicator */}
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/10">
-                <div
-                    className="h-full bg-primary transition-all duration-500"
-                    style={{
-                        width: `${((NAV_ITEMS.findIndex(item => item.href === activeSection) + 1) / NAV_ITEMS.length) * 100}%`
-                    }}
-                />
             </div>
         </header>
     );
