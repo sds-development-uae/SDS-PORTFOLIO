@@ -217,7 +217,7 @@ export default function Footer() {
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2 text-xs text-primary/60">
                             <div className="flex items-center gap-1">
                                 <Heart className="w-3 h-3 text-red-400" />
-                                <span>Made with love in Dubai</span>
+                                <span>Made with love in Kolkata</span>
                             </div>
                             <div className="hidden md:block">•</div>
                             <div>Trade License No: 39987</div>
